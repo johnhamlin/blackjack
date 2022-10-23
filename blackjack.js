@@ -1,7 +1,8 @@
 'use strict';
 
 // TODO
-// aceHi/aceLow logic
+// add suits to cards
+// aceHi/aceLow logic (maybe done?)
 // add cut card to shoe
 // chips for betting (instead of raw numbers)
 
@@ -25,9 +26,13 @@ const CARDS = {
   king: 10,
 };
 
+// Constants
 const NUMBER_OF_DECKS = 1;
 const NUMBER_OF_PLAYERS = 4;
 const BLACKJACK = 21;
+
+// State variables
+let gameOver = false;
 
 // A single deck with four of every card
 const BASE_DECK = Object.keys(CARDS).reduce((deck, card) => {
@@ -42,8 +47,12 @@ class Player {
     this.score = 0;
     this.bet = 0;
     this.money = 500;
+    this.blackjack = false;
     this.stand = false;
     this.busted = false;
+  }
+  isActive() {
+    return !(this.blackjack || this.stand || this.busted);
   }
   updateScore() {
     let tempAceStack = [];
@@ -137,10 +146,17 @@ function deal(players, shoe) {
   }
 }
 
+// TODO:
+function newGame() {
+  gameOver = false;
+}
+
 let shoe = shuffleDeck(NUMBER_OF_DECKS);
 const players = createPlayers(NUMBER_OF_PLAYERS);
 // console.log(players);
 deal(players, shoe);
+// console.log(players[0].isActive());
+console.log(players[0]);
 
 // // test for players with aces
 // const playersWithAces = players.filter(
