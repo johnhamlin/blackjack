@@ -1,5 +1,10 @@
 'use strict';
 
+// TODO
+// aceHi/aceLow logic
+// add cut card to shoe
+// chips for betting (instead of raw numbers)
+
 // map of the values of every card in a deck
 const CARDS = {
   ace: {
@@ -26,14 +31,25 @@ const BASE_DECK = Object.keys(CARDS).reduce((deck, card) => {
   return deck;
 }, []);
 
-// TODO: Allow user to choose the number of decks
 const NUMBER_OF_DECKS = 1;
+const NUMBER_OF_PLAYERS = 4;
 
-// console.log(CARDS[DECK[9][0]]);
+class Player {
+  constructor(playerNum) {
+    this.playerNum = playerNum;
+    this.hand = [];
+    this.score = 0;
+    this.bet = 0;
+    this.money;
+    this.busted = false;
+  }
+}
 
-// console.table(DECK);
-
-// TODO: aceHigh vs aceLow logic
+class Dealer extends Player {
+  constructor() {
+    super('dealer');
+  }
+}
 
 function shuffleDeck(numberOfDecks) {
   let numberOfCards = 52 * numberOfDecks;
@@ -42,21 +58,38 @@ function shuffleDeck(numberOfDecks) {
     card,
     count * numberOfDecks,
   ]);
+  let maxIndexPlusOne = 13; // input for Math.random multiplier
 
   // generate shuffled deck for output
-  // current version is very inefficient because it checks indexes that are empty
   while (numberOfCards > 0) {
-    // generate a random index from 0-12
-    let index = Math.floor(Math.random() * 13);
+    // generate a random index from 0 to (maxIndexPlusOne - 1) -- confusing!
+    let index = Math.floor(Math.random() * maxIndexPlusOne);
+    // destructure array of arrays for easier reference
     let [currentCard, currentCardCount] = cardsAvailable[index];
-    if (currentCardCount > 0) {
-      shuffledDeck.push(currentCard);
-      currentCardCount--;
-      numberOfCards--;
+    // add random card to shuffledDeck and update counters
+    shuffledDeck.push(currentCard);
+    currentCardCount--;
+    numberOfCards--;
+
+    // If that was the last card available of the type, remove it from cardsAvailable
+    if (currentCardCount === 0) {
+      cardsAvailable.splice(index, 1);
+      maxIndexPlusOne--;
     }
   }
+  // TODO: Add cut card
   return shuffledDeck;
 }
 
-let deck = shuffleDeck(NUMBER_OF_DECKS);
-console.table(deck);
+function createPlayers(numberOfPlayers) {
+  const players = [];
+  for (let i = 0; i < numberOfPlayers; i++) {
+    players.push(new Player(i));
+  }
+  players.push(new Dealer());
+  return players;
+}
+
+let shoe = shuffleDeck(NUMBER_OF_DECKS);
+const players = createPlayers(NUMBER_OF_PLAYERS);
+console.table(players);
