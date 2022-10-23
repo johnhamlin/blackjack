@@ -26,23 +26,39 @@ const CARDS = {
   king: 10,
 };
 
+const SUITS_MAP = {
+  clubs: '♣️',
+  diamonds: '♦️',
+  hearts: '♥️',
+  spades: '♠️',
+};
+
 // Constants
-const NUMBER_OF_DECKS = 1;
+const NUMBER_OF_DECKS = 2;
+const CARDS_PER_DECK = 52;
+const SUITS = ['clubs', 'diamonds', 'hearts', 'spades'];
 const NUMBER_OF_PLAYERS = 4;
 const BLACKJACK = 21;
 
 // State variables
 let gameOver = false;
 
-// A single deck with four of every card
+// A single deck with one of every card
 const BASE_DECK = Object.keys(CARDS).reduce((deck, card) => {
-  deck.push([card, 4]);
+  SUITS.forEach(suit => {
+    deck.push({
+      card: card,
+      suit: suit,
+      count: 1,
+    });
+  });
+
   return deck;
 }, []);
 
 class Player {
   constructor(playerNum) {
-    this.playerNum = playerNum;
+    this.number = playerNum;
     this.hand = [];
     this.score = 0;
     this.bet = 0;
@@ -94,27 +110,34 @@ class Dealer extends Player {
 function shuffleDeck(numberOfDecks) {
   let numberOfCards = 52 * numberOfDecks;
   const shuffledDeck = [];
-  let cardsAvailable = BASE_DECK.map(([card, count]) => [
-    card,
-    count * numberOfDecks,
-  ]);
-  let ranks = Object.keys(CARDS).length; // input for Math.random multiplier
+  // create a deep copy of BASE_DECK to avoid mutating it
+  // This whole section seems inefficient... there should be a better way to update the counts
+  let cardsAvailable = JSON.parse(JSON.stringify(BASE_DECK));
+  cardsAvailable.forEach(card => (card.count *= numberOfDecks));
+
+  let uniqueCardsRemaining = CARDS_PER_DECK; // input for Math.random multiplier
 
   // generate shuffled deck for output
   while (numberOfCards > 0) {
-    // generate a random index from 0 to (maxIndexPlusOne - 1) -- confusing!
-    let index = Math.floor(Math.random() * ranks);
-    // destructure array of arrays for easier reference
-    let [currentCard, currentCardCount] = cardsAvailable[index];
+    // generate a random index from 0 to 51 -- one for each unique card
+    let index = Math.floor(Math.random() * uniqueCardsRemaining);
+    // temp variable for easier reference
+    let currentCard = cardsAvailable[index];
+
     // add random card to shuffledDeck and update counters
-    shuffledDeck.push(currentCard);
-    currentCardCount--;
+    shuffledDeck.push({
+      card: currentCard.card,
+      suit: currentCard.suit,
+    });
+
+    // update counters
+    currentCard.count--;
     numberOfCards--;
 
     // If that was the last card available of the type, remove it from cardsAvailable
-    if (currentCardCount === 0) {
+    if (currentCard.count === 0) {
       cardsAvailable.splice(index, 1);
-      ranks--;
+      uniqueCardsRemaining--;
     }
   }
   // TODO: Add cut card
@@ -151,12 +174,17 @@ function newGame() {
   gameOver = false;
 }
 
+// console.table(BASE_DECK);
+
 let shoe = shuffleDeck(NUMBER_OF_DECKS);
+console.table(shoe);
 const players = createPlayers(NUMBER_OF_PLAYERS);
-// console.log(players);
 deal(players, shoe);
-// console.log(players[0].isActive());
-console.log(players[0]);
+
+// print player hands
+// players.forEach(player =>
+//   console.table([player.number, player.hand[0], player.hand[1]])
+// );
 
 // // test for players with aces
 // const playersWithAces = players.filter(
