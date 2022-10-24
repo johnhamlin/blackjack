@@ -51,3 +51,10 @@ header {
 .io-area {
   grid-area: io-area;
 }
+
+.hand {
+}
+
+.card {
+  width: 70px;
+}

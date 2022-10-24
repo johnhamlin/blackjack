@@ -58,7 +58,7 @@ const BASE_DECK = Object.keys(CARDS).reduce((deck, card) => {
 
 class Player {
   constructor(playerNum) {
-    this.number = playerNum;
+    this.num = playerNum;
     this.hand = [];
     this.score = 0;
     this.bet = 0;
@@ -66,6 +66,11 @@ class Player {
     this.blackjack = false;
     this.stand = false;
     this.busted = false;
+
+    // DOM Selectors
+    console.log(playerNum);
+
+    this.handDisplay = document.querySelector(`.hand--${playerNum}`);
   }
   isActive() {
     return !(this.blackjack || this.stand || this.busted);
@@ -98,6 +103,13 @@ class Player {
     // check for bust
     if (this.score > 21) {
     }
+  }
+  displayCard(card) {
+    let cardsImg = document.createElement('img');
+    cardsImg.src = `./cards/${card.card}_of_${card.suit}.svg`;
+    cardsImg.className = 'card';
+    let currentHand = document.getElementById(`hand--${this.num}`);
+    currentHand.appendChild(cardsImg);
   }
 }
 
@@ -162,7 +174,9 @@ function deal(players, shoe) {
       // deal a card
       const card = shoe.shift();
       // push card to player's hand
+      console.log(card);
       player.hand.push(card);
+      player.displayCard(card);
       // add card value to score
       player.updateScore();
     });
@@ -172,14 +186,15 @@ function deal(players, shoe) {
 // TODO:
 function newGame() {
   gameOver = false;
+  let shoe = shuffleDeck(NUMBER_OF_DECKS);
+  const players = createPlayers(NUMBER_OF_PLAYERS);
+  deal(players, shoe);
 }
 
-// console.table(BASE_DECK);
+const btnNewGame = document.querySelector('.new-game');
+newGame();
 
-let shoe = shuffleDeck(NUMBER_OF_DECKS);
-console.table(shoe);
-const players = createPlayers(NUMBER_OF_PLAYERS);
-deal(players, shoe);
+// console.table(BASE_DECK);
 
 // print player hands
 // players.forEach(player =>
