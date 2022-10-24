@@ -191,6 +191,7 @@ function newGame() {
   deal(players, shoe);
 }
 
+// TODO: Dealer Card face down
 const btnNewGame = document.querySelector('.new-game');
 newGame();
 
