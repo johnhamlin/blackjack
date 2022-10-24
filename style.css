@@ -1,5 +1,53 @@
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: inherit;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100%;
+  padding: 2rem;
+  background-color: lightgreen;
+}
+
+.play-area {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: auto;
+  grid-template-areas:
+    'header header header header'
+    'dealer dealer dealer dealer'
+    'player3 player2 player1 player0'
+    'io-area io-area io-area io-area';
+  justify-items: center;
+}
+
+h1 {
+  text-align: center;
+}
+
+header {
+  grid-area: header;
+}
+
+.dealer-area {
+  grid-area: dealer;
+}
+
+.player0-area {
+  grid-area: player0;
+}
+
+.player1-area {
+  grid-area: player1;
+}
+
+.player2-area {
+  grid-area: player2;
+}
+
+.player3-area {
+  grid-area: player3;
+}
+
+.io-area {
+  grid-area: io-area;
 }
