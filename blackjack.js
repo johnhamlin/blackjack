@@ -26,6 +26,7 @@ const CARDS = {
   king: 10,
 };
 
+// map of suits to their corresponding emoji (not currently used)
 const SUITS_MAP = {
   clubs: '♣️',
   diamonds: '♦️',
@@ -58,7 +59,7 @@ const BASE_DECK = Object.keys(CARDS).reduce((deck, card) => {
 
 class Player {
   constructor(playerNum) {
-    this.num = playerNum;
+    this.id = playerNum;
     this.hand = [];
     this.score = 0;
     this.bet = 0;
@@ -68,9 +69,8 @@ class Player {
     this.busted = false;
 
     // DOM Selectors
-    console.log(playerNum);
-
     this.handDisplay = document.querySelector(`.hand--${playerNum}`);
+    this.scoreDisplay = document.querySelector(`.score--${playerNum}`);
   }
   isActive() {
     return !(this.blackjack || this.stand || this.busted);
@@ -80,9 +80,9 @@ class Player {
 
     // reset score by looping through entire hand and calculate total score (allows me to account for aceHigh vs aceLow)
     this.score = this.hand.reduce((score, card) => {
-      if (card === 'ace') {
-        tempAceStack.push(card);
-      } else score += CARDS[card];
+      if (card.card === 'ace') {
+        tempAceStack.push(card.card);
+      } else score += CARDS[card.card];
       return score;
     }, 0);
 
@@ -104,12 +104,14 @@ class Player {
     if (this.score > 21) {
     }
   }
+  displayScore() {
+    this.scoreDisplay.textContent = this.score;
+  }
   displayCard(card) {
     let cardsImg = document.createElement('img');
     cardsImg.src = `./cards/${card.card}_of_${card.suit}.svg`;
     cardsImg.className = 'card';
-    let currentHand = document.getElementById(`hand--${this.num}`);
-    currentHand.appendChild(cardsImg);
+    this.handDisplay.appendChild(cardsImg);
   }
 }
 
@@ -179,6 +181,7 @@ function deal(players, shoe) {
       player.displayCard(card);
       // add card value to score
       player.updateScore();
+      player.displayScore();
     });
   }
 }
@@ -186,14 +189,12 @@ function deal(players, shoe) {
 // TODO:
 function newGame() {
   gameOver = false;
-  let shoe = shuffleDeck(NUMBER_OF_DECKS);
-  const players = createPlayers(NUMBER_OF_PLAYERS);
-  deal(players, shoe);
 }
 
 // TODO: Dealer Card face down
-const btnNewGame = document.querySelector('.new-game');
-newGame();
+let shoe = shuffleDeck(NUMBER_OF_DECKS);
+const players = createPlayers(NUMBER_OF_PLAYERS);
+deal(players, shoe);
 
 // console.table(BASE_DECK);
 
