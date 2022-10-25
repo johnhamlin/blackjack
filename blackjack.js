@@ -182,8 +182,11 @@ function createPlayers(numberOfPlayers) {
   const players = [];
   // create new players and add them to array
   for (let i = 0; i < numberOfPlayers; i++) players.push(new Player(i));
+
+  // DON'T add dealer to end anymore because we named the dealer for easy reference, we're going to access him by and event instead of a loop, and his presence in the players array creates infinite loops.
   // add a dealer at the end
-  players.push(dealer);
+  // players.push(dealer);
+
   return players;
 }
 
@@ -207,9 +210,10 @@ function deal(players, shoe) {
   shoe.shift();
   // deal two cards to each player
   for (let i = 0; i < 2; i++) {
-    players.forEach(player => {
-      player.hit();
-    });
+    // deal one card to each player
+    players.forEach(player => player.hit());
+    // deal a card to the dealer
+    dealer.hit();
   }
 }
 
