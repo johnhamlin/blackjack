@@ -1,10 +1,12 @@
 'use strict';
 
 // TODO
-// add suits to cards
+// display burn card
 // aceHi/aceLow logic (maybe done?)
 // add cut card to shoe
+// betting
 // chips for betting (instead of raw numbers)
+// animate dealing
 
 // map of the values of every card in a deck
 const CARDS = {
@@ -113,8 +115,9 @@ class Player {
   }
   displayCard(card) {
     let cardsImg = document.createElement('img');
-    cardsImg.src = `./cards/${card.card}_of_${card.suit}.svg`;
+    cardsImg.loading = 'lazy';
     cardsImg.className = 'card';
+    cardsImg.src = `./cards/${card.card}_of_${card.suit}.svg`;
     this.handDisplay.appendChild(cardsImg);
   }
   hit() {
