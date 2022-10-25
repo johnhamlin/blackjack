@@ -43,6 +43,8 @@ const BLACKJACK = 21;
 
 // State variables
 let gameOver = false;
+let dealersTurn = false;
+let activePlayer;
 
 // A single deck with one of every card
 const BASE_DECK = Object.keys(CARDS).reduce((deck, card) => {
@@ -72,8 +74,8 @@ class Player {
     this.handDisplay = document.querySelector(`.hand--${playerNum}`);
     this.scoreDisplay = document.querySelector(`.score--${playerNum}`);
   }
-  isActive() {
-    return !(this.blackjack || this.stand || this.busted);
+  isOut() {
+    return this.blackjack || this.stand || this.busted;
   }
   updateScore() {
     let tempAceStack = [];
@@ -113,6 +115,17 @@ class Player {
     cardsImg.className = 'card';
     this.handDisplay.appendChild(cardsImg);
   }
+  hit() {
+    // deal a card
+    const card = shoe.shift();
+    // push card to player's hand
+    console.log(card);
+    this.hand.push(card);
+    this.displayCard(card);
+    // add card value to score
+    this.updateScore();
+    this.displayScore();
+  }
 }
 
 class Dealer extends Player {
@@ -120,6 +133,9 @@ class Dealer extends Player {
     super('dealer');
   }
 }
+
+// instantiate a dealer
+let dealer = new Dealer();
 
 function shuffleDeck(numberOfDecks) {
   let numberOfCards = 52 * numberOfDecks;
@@ -163,8 +179,23 @@ function createPlayers(numberOfPlayers) {
   // create new players and add them to array
   for (let i = 0; i < numberOfPlayers; i++) players.push(new Player(i));
   // add a dealer at the end
-  players.push(new Dealer());
+  players.push(dealer);
   return players;
+}
+
+function nextPlayer() {
+  let index = players.indexOf(activePlayer);
+  // increment index by one, using mod to loop around
+  do {
+    index = (index + 1) % NUMBER_OF_PLAYERS;
+    // check for every player is out
+    if (players.every(player => player.isOut())) {
+      dealersTurn = true;
+      activePlayer = dealer;
+      return;
+    }
+  } while (players[index].isOut());
+  console.log((activePlayer = players[index]));
 }
 
 function deal(players, shoe) {
@@ -173,15 +204,7 @@ function deal(players, shoe) {
   // deal two cards to each player
   for (let i = 0; i < 2; i++) {
     players.forEach(player => {
-      // deal a card
-      const card = shoe.shift();
-      // push card to player's hand
-      console.log(card);
-      player.hand.push(card);
-      player.displayCard(card);
-      // add card value to score
-      player.updateScore();
-      player.displayScore();
+      player.hit();
     });
   }
 }
@@ -195,6 +218,7 @@ function newGame() {
 let shoe = shuffleDeck(NUMBER_OF_DECKS);
 const players = createPlayers(NUMBER_OF_PLAYERS);
 deal(players, shoe);
+activePlayer = players[0];
 
 // console.table(BASE_DECK);
 
