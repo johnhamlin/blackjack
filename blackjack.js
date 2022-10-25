@@ -104,6 +104,7 @@ class Player {
 
     // check for bust
     if (this.score > 21) {
+      this.busted = true;
     }
   }
   displayScore() {
@@ -125,9 +126,6 @@ class Player {
     // add card value to score
     this.updateScore();
     // check for bust (may use in display score)
-    if (this.score > 21) {
-      this.busted = true;
-    }
 
     this.displayScore();
     nextPlayer();
@@ -191,15 +189,15 @@ function createPlayers(numberOfPlayers) {
 
 function nextPlayer() {
   let index = players.indexOf(activePlayer);
+  // check for every player is out
+  if (players.every(player => player.isOut())) {
+    dealersTurn = true;
+    activePlayer = dealer;
+    return;
+  }
   // increment index by one, using mod to loop around
   do {
     index = (index + 1) % NUMBER_OF_PLAYERS;
-    // check for every player is out
-    if (players.every(player => player.isOut())) {
-      dealersTurn = true;
-      activePlayer = dealer;
-      return;
-    }
   } while (players[index].isOut());
   activePlayer = players[index];
 }
