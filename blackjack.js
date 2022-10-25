@@ -107,7 +107,8 @@ class Player {
     }
   }
   displayScore() {
-    this.scoreDisplay.textContent = this.score;
+    if (this.busted) this.scoreDisplay.textContent = 'Busted';
+    else this.scoreDisplay.textContent = this.score;
   }
   displayCard(card) {
     let cardsImg = document.createElement('img');
@@ -119,12 +120,17 @@ class Player {
     // deal a card
     const card = shoe.shift();
     // push card to player's hand
-    console.log(card);
     this.hand.push(card);
     this.displayCard(card);
     // add card value to score
     this.updateScore();
+    // check for bust (may use in display score)
+    if (this.score > 21) {
+      this.busted = true;
+    }
+
     this.displayScore();
+    nextPlayer();
   }
 }
 
@@ -195,7 +201,7 @@ function nextPlayer() {
       return;
     }
   } while (players[index].isOut());
-  console.log((activePlayer = players[index]));
+  activePlayer = players[index];
 }
 
 function deal(players, shoe) {
@@ -219,6 +225,11 @@ let shoe = shuffleDeck(NUMBER_OF_DECKS);
 const players = createPlayers(NUMBER_OF_PLAYERS);
 deal(players, shoe);
 activePlayer = players[0];
+
+// buttons
+document
+  .querySelector('.hit-btn')
+  .addEventListener('click', () => activePlayer.hit());
 
 // console.table(BASE_DECK);
 
