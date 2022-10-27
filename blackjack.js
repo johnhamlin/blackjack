@@ -50,6 +50,7 @@ const BLACKJACK = 21;
 let gameOver = false;
 let dealersTurn = false;
 let activePlayer;
+let dealing = true; // this is a hacky fix to make my deal function work now that I changed the way nextPlayer works.
 
 // A single deck with one of every card
 const BASE_DECK = Object.keys(CARDS).reduce((deck, card) => {
@@ -141,7 +142,7 @@ class Player {
     // check for bust (may use in display score)
 
     this.displayScore();
-    nextPlayer();
+    updateActivePlayer();
   }
 }
 
@@ -217,7 +218,7 @@ function createPlayers(numberOfPlayers) {
   return players;
 }
 
-function nextPlayer() {
+function updateActivePlayer() {
   let index = players.indexOf(activePlayer);
   console.log('loop nextplayer');
   // check for every player is out
@@ -231,11 +232,13 @@ function nextPlayer() {
     return;
   }
   // increment index by one, using mod to loop around
-  do {
-    console.log('loop nextplayer do-while');
-    index = (index + 1) % NUMBER_OF_PLAYERS;
-  } while (players[index].isOut());
-  activePlayer = players[index];
+  if (activePlayer.isOut() || dealing) {
+    do {
+      console.log('loop nextplayer do-while');
+      index = (index + 1) % NUMBER_OF_PLAYERS;
+    } while (players[index].isOut());
+    activePlayer = players[index];
+  }
 }
 
 function deal(players, shoe) {
@@ -248,6 +251,7 @@ function deal(players, shoe) {
     // deal a card to the dealer
     dealer.hit();
   }
+  dealing = false;
 }
 
 // TODO:
@@ -258,6 +262,7 @@ function newGame() {
 // TODO: Dealer Card face down
 let shoe = shuffleDeck(NUMBER_OF_DECKS);
 const players = createPlayers(NUMBER_OF_PLAYERS);
+activePlayer = players[0];
 deal(players, shoe);
 activePlayer = players[0];
 
@@ -269,7 +274,7 @@ document
 document.querySelector('.stand-btn').addEventListener('click', () => {
   activePlayer.stand = true;
   activePlayer.displayScore();
-  nextPlayer();
+  updateActivePlayer();
 });
 
 // console.table(BASE_DECK);
