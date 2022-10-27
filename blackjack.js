@@ -1,5 +1,8 @@
 'use strict';
 
+// BUGS
+// infinite loop when player hits with two aces (maybe just issue with last player?)
+
 // TODO
 // display burn card
 // aceHi/aceLow logic (maybe done?)
@@ -110,12 +113,19 @@ class Player {
     }
   }
   displayScore() {
-    if (this.busted) this.scoreDisplay.textContent = 'Busted';
-    else this.scoreDisplay.textContent = this.score;
+    if (this.busted) {
+      this.scoreDisplay.textContent = 'Busted';
+      return;
+    }
+    if (this.stand) {
+      this.scoreDisplay.textContent = `Stands at ${this.score}`;
+      return;
+    }
+    this.scoreDisplay.textContent = this.score;
   }
   displayCard(card) {
     let cardsImg = document.createElement('img');
-    cardsImg.loading = 'lazy';
+    // cardsImg.loading = 'lazy';
     cardsImg.className = 'card';
     cardsImg.src = `./cards/${card.card}_of_${card.suit}.svg`;
     this.handDisplay.appendChild(cardsImg);
@@ -138,6 +148,20 @@ class Player {
 class Dealer extends Player {
   constructor() {
     super('dealer');
+  }
+  play() {
+    while (!dealer.isOut()) {
+      if (
+        dealer.score < 17 ||
+        (dealer.score === 17 && dealer.hand.includes('ace'))
+      ) {
+        dealer.hit();
+        console.log('loop dealer play');
+      } else {
+        dealer.stand = true;
+        dealer.displayScore();
+      }
+    }
   }
 }
 
@@ -195,14 +219,20 @@ function createPlayers(numberOfPlayers) {
 
 function nextPlayer() {
   let index = players.indexOf(activePlayer);
+  console.log('loop nextplayer');
   // check for every player is out
   if (players.every(player => player.isOut())) {
+    // dealer plays
+    dealer.play();
+    // all of this bs may be unneeded
     dealersTurn = true;
     activePlayer = dealer;
+
     return;
   }
   // increment index by one, using mod to loop around
   do {
+    console.log('loop nextplayer do-while');
     index = (index + 1) % NUMBER_OF_PLAYERS;
   } while (players[index].isOut());
   activePlayer = players[index];
@@ -235,6 +265,12 @@ activePlayer = players[0];
 document
   .querySelector('.hit-btn')
   .addEventListener('click', () => activePlayer.hit());
+
+document.querySelector('.stand-btn').addEventListener('click', () => {
+  activePlayer.stand = true;
+  activePlayer.displayScore();
+  nextPlayer();
+});
 
 // console.table(BASE_DECK);
 
