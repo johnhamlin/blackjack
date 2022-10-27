@@ -265,6 +265,9 @@ const players = createPlayers(NUMBER_OF_PLAYERS);
 activePlayer = players[0];
 deal(players, shoe);
 activePlayer = players[0];
+if (dealer.hand[1] === 'ace') {
+  // offer insurance
+}
 
 // buttons
 document
